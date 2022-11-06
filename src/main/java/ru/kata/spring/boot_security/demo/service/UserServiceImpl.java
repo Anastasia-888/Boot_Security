@@ -4,8 +4,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import ru.kata.spring.boot_security.demo.dao.UserDao;
 import ru.kata.spring.boot_security.demo.model.User;
-import ru.kata.spring.boot_security.demo.repository.UserRepository;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -13,54 +13,47 @@ import java.util.List;
 import static java.util.Objects.isNull;
 
 @Service
-public class UserServiceImpl implements UserService, UserDetailsService {
+public class UserServiceImpl implements UserService {
 
-    private final UserRepository userRepository;
+    private final UserDao userRepository;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserDao userRepository) {
         this.userRepository = userRepository;
     }
 
     @Override
     public List<User> getUsers() {
-        return userRepository.findAll();
+        return userRepository.getUsers();
     }
 
     @Override
+    @Transactional
     public void add(User user) {
-        userRepository.save(user);
+        userRepository.add(user);
     }
 
     @Override
+    @Transactional
     public User getUserById(int id) {
-        return userRepository.findById(id).orElse(null);
+        return userRepository.getUserById(id);
     }
 
     @Override
-    public void update(User newUser) {
-        userRepository.save(newUser);
+    @Transactional
+    public void update(User newUser, int id) {
+        userRepository.update(newUser, id);
     }
 
     @Override
+    @Transactional
     public void delete(User user) {
         userRepository.delete(user);
     }
 
     @Override
-    public User getUserByName(String name) {
-        return userRepository.findByName(name);
-    }
-
-    @Override
     @Transactional
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByName(username);
-
-        if (isNull(user)) {
-            throw new UsernameNotFoundException("User not found");
-        }
-
-        return new org.springframework.security.core.userdetails.User(user.getName(),
-                user.getPassword(), user.getAuthorities());
+    public User getUserByName(String name) {
+        return userRepository.getUserByName(name);
     }
+
 }

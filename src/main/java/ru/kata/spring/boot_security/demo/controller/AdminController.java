@@ -40,8 +40,8 @@ public class AdminController {
     }
 
     @PostMapping("/{id}")
-    public String update(@ModelAttribute("user") User user){
-        userService.update(user);
+    public String update(@ModelAttribute("user") User user, @PathVariable(value = "id") int id){
+        userService.update(user, id);
         return "redirect:/admin";
     }
 
